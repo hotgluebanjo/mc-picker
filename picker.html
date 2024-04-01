@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker for Various Subjects</title>
+<style type="text/css">
+body {
+    color: #fff;
+    font-family: system-ui;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    min-height: 100vh;
+}
+#results {
+    margin-top: 20px;
+    display: none;
+    text-align: center;
+}
+#controls {
+    position: absolute;
+    left: 1%;
+    top: 10%;
+    transform: translateY(-50%);
+}
+#subject {
+    margin-top: 20px;
+    font-size: 40px;
+}
+input[type="range"] {
+    width: 250px;
+}
+#nextBtn {
+    display: inline-block;
+    margin: 10px 0 0;
+}
+textarea {
+    width: 400px;
+    height: 150px;
+    margin-bottom: 10px;
+}
+button {
+    display: block;
+    margin: 0 auto;
+}
+@media (orientation: portrait) {
+    #controls {
+        top: auto;
+        bottom: 10%;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<script type="text/javascript">
+let currentSubjectIndex = 0;
+const subjects = ['Skin', 'Green Grass', 'Blue Sky', 'Red Shirt', 'Fire'];
+let results = [];
+
+function init() {
+    document.body.style.background = "rgb(0, 0, 0)";
+    document.getElementById("rgb_r").value = "0";
+    document.getElementById("rgb_g").value = "0";
+    document.getElementById("rgb_b").value = "0";
+    updateSubject();
+}
+
+function updateSubject() {
+    document.getElementById("subject").textContent = `${subjects[currentSubjectIndex]} (${currentSubjectIndex + 1}/${subjects.length})`;
+}
+
+function nextSubject() {
+    const r = document.getElementById("rgb_r").value;
+    const g = document.getElementById("rgb_g").value;
+    const b = document.getElementById("rgb_b").value;
+    
+    const rl = Math.pow(r, 2.2);
+    const gl = Math.pow(g, 2.2);
+    const bl = Math.pow(b, 2.2);
+    
+    const bx = 0.4124564 * rl + 0.3575761 * gl + 0.1804375 * bl;
+    const by = 0.2126729 * rl + 0.7151522 * gl + 0.0721750 * bl;
+    const bz = 0.0193339 * rl + 0.1191920 * gl + 0.9503041 * bl;
+    
+    const s = (bx + by + bz);
+    const x = s == 0.0 ? 0.0 : bx / s;
+    const y = s == 0.0 ? 0.0 : by / s;
+    const Y = by;
+
+    results.push(`${subjects[currentSubjectIndex]}: ${x}, ${y}, ${by}`);
+    currentSubjectIndex++;
+
+    if (currentSubjectIndex >= subjects.length) {
+        displayResults();
+    } else {
+        updateSubject();
+    }
+}
+
+function displayResults() {
+    document.getElementById("results").style.display = "block";
+    document.getElementById("resultsText").value = results.join("\n");
+    alert("Thank you for participating! Could you please copy the results?");
+}
+
+function update() {
+    const r = document.getElementById("rgb_r").value;
+    const g = document.getElementById("rgb_g").value;
+    const b = document.getElementById("rgb_b").value;
+
+    document.body.style.background = `rgb(${r * 255}, ${g * 255}, ${b * 255})`;
+}
+
+function copyResults() {
+    const resultsText = document.getElementById("resultsText");
+    resultsText.select();
+    resultsText.setSelectionRange(0, 99999);
+    document.execCommand("copy")
+}
+</script>
+</head>
+<body onload="init()">
+    <noscript>This page requires JavaScript.</noscript>
+    <div id="subject">Subject</div>
+    <div id="controls">
+        <label for="rgb_r">R</label>
+        <input oninput="update()" type="range" id="rgb_r" min="0" max="1" step="any">
+        <br>
+
+        <label for="rgb_g">G</label>
+        <input oninput="update()" type="range" id="rgb_g" min="0" max="1" step="any">
+        <br>
+
+        <label for="rgb_b">B</label>
+        <input oninput="update()" type="range" id="rgb_b" min="0" max="1" step="any">
+        <br>
+
+        <button id="nextBtn" onclick="nextSubject()">Next</button>
+    </div>
+    <div id="results">
+        <textarea id="resultsText"></textarea>
+        <button onclick="copyResults()">Copy</button>
+    </div>
+</body>
+</html>
