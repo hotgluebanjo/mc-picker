@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan</title>
+<script type="text/javascript">
+const sequence = ["rgb(255, 0, 0)", "rgb(0, 255, 0)", "rgb(0, 0, 255)"];
+let current = 0;
+
+function advance() {
+    document.body.style.background = sequence[current];
+    current = (current + 1) % sequence.length;
+}
+
+window.setInterval(advance, 2.5 * 1000);
+</script>
+</head>
+<body onload="advance()">
+</body>
+</html>
